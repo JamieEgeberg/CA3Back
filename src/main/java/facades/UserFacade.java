@@ -34,7 +34,7 @@ public class UserFacade implements IUserFacade {
     @Override
     public List<User> getUsers() {
         EntityManager em = emf.createEntityManager();
-        TypedQuery<User> query = em.createQuery("SELECT u FROM User u ",
+        TypedQuery<User> query = em.createQuery("SELECT u FROM SEED_USER u ",
                                                 User.class);
         return query.getResultList();
     }

@@ -17,6 +17,7 @@ import javax.ws.rs.core.MediaType;
  * @author Niki
  */
 @Path("user")
+//@RolesAllowed("Admin")
 public class UserResource {
 
     private IUserFacade facade;
