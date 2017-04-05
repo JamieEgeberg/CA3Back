@@ -4,51 +4,97 @@ import entity.User;
 import security.IUser;
 import security.IUserFacade;
 import security.PasswordStorage;
+import utils.Utility;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceException;
+import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class UserFacade implements IUserFacade {
 
-  EntityManagerFactory emf;
+    EntityManagerFactory emf;
 
-  public UserFacade(EntityManagerFactory emf) {
-    this.emf = emf;   
-  }
-
-  private EntityManager getEntityManager() {
-    return emf.createEntityManager();
-  }
-
-  @Override
-  public IUser getUserByUserId(String id) {
-    EntityManager em = getEntityManager();
-    try {
-      return em.find(User.class, id);
-    } finally {
-      em.close();
+    public UserFacade(EntityManagerFactory emf) {
+        this.emf = emf;
     }
-  }
 
-  /*
-  Return the Roles if users could be authenticated, otherwise null
-   */
-  @Override
-  public List<String> authenticateUser(String userName, String password) {
-    IUser user = getUserByUserId(userName);
-      try {  
-          return user != null &&  PasswordStorage.verifyPassword(password, user.getPassword()) ? user.getRolesAsStrings() : null;
-      } catch (PasswordStorage.CannotPerformOperationException ex) {
-          Logger.getLogger(UserFacade.class.getName()).log(Level.SEVERE, null, ex);
-      } catch (PasswordStorage.InvalidHashException ex) {
-          System.out.println("Password error");
-      }
-      return null;
-  }
+    private EntityManager getEntityManager() {
+        return emf.createEntityManager();
+    }
 
+    @Override
+    public IUser getUserByUserId(String id) {
+        return find(id);
+    }
 
+    @Override
+    public List<User> getUsers() {
+        EntityManager em = emf.createEntityManager();
+        TypedQuery<User> query = em.createQuery("SELECT u FROM User u ",
+                                                User.class);
+        return query.getResultList();
+    }
+
+    @Override
+    public User deleteUser(String id) {
+        EntityManager em = emf.createEntityManager();
+        User toBeRemoved = null;
+        try {
+            em.getTransaction().begin();
+            toBeRemoved = em.merge(find(id));
+            em.remove(toBeRemoved);
+            em.getTransaction().commit();
+        } catch (PersistenceException e) {
+            em.getTransaction().rollback();
+        } finally {
+            em.close();
+        }
+        return toBeRemoved;
+    }
+
+    @Override
+    public User addUser(User user) {
+        Utility.persist(getEntityManager(), user);
+        return user;
+    }
+
+    @Override
+    public User editUser(User user) {
+        Utility.merge(getEntityManager(), user);
+        return user;
+    }
+
+    /**
+     * Find Person by Id
+     *
+     * @param id Identity Id
+     * @return Person with given Id
+     */
+    private User find(String id) {
+        EntityManager em = getEntityManager();
+        return em.find(User.class, id);
+    }
+
+    /*
+    Return the Roles if users could be authenticated, otherwise null
+     */
+    @Override
+    public List<String> authenticateUser(String userName, String password) {
+        IUser user = getUserByUserId(userName);
+        try {
+            return user != null && PasswordStorage.verifyPassword(password,
+                                                                  user.getPassword()) ? user.getRolesAsStrings() : null;
+        } catch (PasswordStorage.CannotPerformOperationException ex) {
+            Logger.getLogger(UserFacade.class.getName()).log(Level.SEVERE,
+                                                             null, ex);
+        } catch (PasswordStorage.InvalidHashException ex) {
+            System.out.println("Password error");
+        }
+        return null;
+    }
 
 }

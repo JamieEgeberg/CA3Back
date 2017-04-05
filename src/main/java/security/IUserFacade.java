@@ -26,7 +26,7 @@ public interface IUserFacade {
 
     User deleteUser(String id);
 
-    void addUser(User user);
+    User addUser(User user);
 
-    void editUser(User user);
+    User editUser(User user);
 }
