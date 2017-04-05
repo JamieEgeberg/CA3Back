@@ -34,7 +34,7 @@ public class BookResource {
      * Creates a new instance of PersonResource
      */
     public BookResource() {
-        emf = Persistence.createEntityManagerFactory("PU");
+        emf = Persistence.createEntityManagerFactory("pu_development");
         facade = new BookFacade(emf);
     }
 
