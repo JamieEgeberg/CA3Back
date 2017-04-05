@@ -1,14 +1,15 @@
 package facades;
 
-import security.IUserFacade;
 import entity.User;
+import security.IUser;
+import security.IUserFacade;
+import security.PasswordStorage;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import security.IUser;
-import security.PasswordStorage;
 
 public class UserFacade implements IUserFacade {
 
@@ -47,5 +48,7 @@ public class UserFacade implements IUserFacade {
       }
       return null;
   }
+
+
 
 }
