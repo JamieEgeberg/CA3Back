@@ -43,7 +43,7 @@ public class RoleFacade implements IRoleFacade {
     @Override
     public List<Role> getRoles() {
         EntityManager em = emf.createEntityManager();
-        TypedQuery<Role> query = em.createQuery("SELECT b FROM Book b ",
+        TypedQuery<Role> query = em.createQuery("SELECT r FROM USER_ROLE r",
                                                 Role.class);
         return query.getResultList();
     }

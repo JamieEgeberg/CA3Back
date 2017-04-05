@@ -12,7 +12,7 @@ import javax.persistence.ManyToMany;
 public class Role implements Serializable {
 
   @ManyToMany(mappedBy = "roles")
-  private List<User> users;
+  private transient List<User> users;
 
   private static final long serialVersionUID = 1L;
   

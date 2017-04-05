@@ -34,7 +34,7 @@ public class UserFacade implements IUserFacade {
     @Override
     public List<User> getUsers() {
         EntityManager em = emf.createEntityManager();
-        TypedQuery<User> query = em.createQuery("SELECT u FROM SEED_USER u ",
+        TypedQuery<User> query = em.createQuery("SELECT u FROM SEED_USER u",
                                                 User.class);
         return query.getResultList();
     }
@@ -58,12 +58,18 @@ public class UserFacade implements IUserFacade {
 
     @Override
     public User addUser(User user) {
-        Utility.persist(getEntityManager(), user);
+        try {
+            user.setPassword(PasswordStorage.createHash(user.getPassword()));
+            Utility.persist(getEntityManager(), user);
+        } catch (PasswordStorage.CannotPerformOperationException ignored) {
+        }
         return user;
     }
 
     @Override
     public User editUser(User user) {
+        User oldUser = find(user.getUserName());
+        user.setPassword(oldUser.getPassword());
         Utility.merge(getEntityManager(), user);
         return user;
     }
@@ -86,8 +92,9 @@ public class UserFacade implements IUserFacade {
     public List<String> authenticateUser(String userName, String password) {
         IUser user = getUserByUserId(userName);
         try {
-            return user != null && PasswordStorage.verifyPassword(password,
-                                                                  user.getPassword()) ? user.getRolesAsStrings() : null;
+            return user != null &&
+                    PasswordStorage.verifyPassword(password, user.getPassword
+                            ()) ? user.getRolesAsStrings() : null;
         } catch (PasswordStorage.CannotPerformOperationException ex) {
             Logger.getLogger(UserFacade.class.getName()).log(Level.SEVERE,
                                                              null, ex);
