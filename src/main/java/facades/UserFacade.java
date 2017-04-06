@@ -1,5 +1,6 @@
 package facades;
 
+import entity.Role;
 import entity.User;
 import security.IUser;
 import security.IUserFacade;
@@ -10,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceException;
 import javax.persistence.TypedQuery;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,9 +19,11 @@ import java.util.logging.Logger;
 public class UserFacade implements IUserFacade {
 
     EntityManagerFactory emf;
+    IRoleFacade roleFacade;
 
     public UserFacade(EntityManagerFactory emf) {
         this.emf = emf;
+        roleFacade = new RoleFacade(emf);
     }
 
     private EntityManager getEntityManager() {
@@ -59,6 +63,7 @@ public class UserFacade implements IUserFacade {
     @Override
     public User addUser(User user) {
         try {
+            doRoleStuff(user, false);
             user.setPassword(PasswordStorage.createHash(user.getPassword()));
             Utility.persist(getEntityManager(), user);
         } catch (PasswordStorage.CannotPerformOperationException ignored) {
@@ -70,8 +75,36 @@ public class UserFacade implements IUserFacade {
     public User editUser(User user) {
         User oldUser = find(user.getUserName());
         user.setPassword(oldUser.getPassword());
+        doRoleStuff(user, true);
         Utility.merge(getEntityManager(), user);
         return user;
+    }
+
+    private void doRoleStuff(User user, boolean isEdit) {
+        List<Role> roles = roleFacade.getRoles();
+        if(isEdit) {
+            for (int i = 0; i < roles.size(); i++) {
+                Role role = roles.get(i);
+                List<User> users = role.getUsers();
+                for (int j = 0; j < users.size(); j++) {
+                    User user2 = users.get(j);
+                    if (user2.getUserName().equals(user.getUserName())) {
+                        role.getUsers().remove(j);
+                    }
+                }
+            }
+        }
+        List<Role> newRoles = new ArrayList<>();
+        for (int i = 0; i < user.getRoles().size(); i++) {
+            for (Role role : roles) {
+                if (user.getRoles().get(i).getRoleName().equals(role.getRoleName())) {
+                    newRoles.add(role);
+                    role.addUser(user);
+                    break;
+                }
+            }
+        }
+        user.setRoles(newRoles);
     }
 
     /**
