@@ -1,21 +1,25 @@
 package entity;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.gson.annotations.Expose;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "USER_ROLE")
 public class Role implements Serializable {
 
+  @Expose(serialize = false)
   @ManyToMany(mappedBy = "roles")
-  private transient List<User> users;
+  private List<User> users;
 
   private static final long serialVersionUID = 1L;
-  
+
+  @Expose
   @Id
   @Column(length = 30, name = "ROLE_NAME")
   private String roleName ;

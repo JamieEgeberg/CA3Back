@@ -1,5 +1,6 @@
 package entity;
 
+import com.google.gson.annotations.Expose;
 import security.IUser;
 
 import javax.persistence.Column;
@@ -13,14 +14,17 @@ import java.util.List;
 @Entity(name = "SEED_USER")
 public class User implements IUser, Serializable{
  
-  //You will need to change this to save a Hashed/salted password 
+  //You will need to change this to save a Hashed/salted password
+  @Expose(serialize = false)
   @Column(length = 255, name = "PASSWORD_HASH",nullable = false)
-  private transient String passwordHash;
+  private String passwordHash;
 
+  @Expose
   @Id
   @Column(length = 35, name = "USER_NAME",nullable = false)
   private String userName;
-  
+
+  @Expose
   @ManyToMany
   List<Role> roles;
  

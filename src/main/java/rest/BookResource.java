@@ -1,6 +1,7 @@
 package rest;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import entity.Book;
 import facades.BookFacade;
 import facades.IBookFacade;
@@ -25,7 +26,8 @@ public class BookResource {
 
     private IBookFacade facade;
     private EntityManagerFactory emf;
-    private static Gson gson = new Gson();
+    private static GsonBuilder builder;
+    private static Gson gson;
 
     @Context
     private UriInfo context;
@@ -34,6 +36,9 @@ public class BookResource {
      * Creates a new instance of PersonResource
      */
     public BookResource() {
+        builder = new GsonBuilder();
+        builder.excludeFieldsWithoutExposeAnnotation();
+        gson = builder.create();
         emf = Persistence.createEntityManagerFactory("pu_development");
         facade = new BookFacade(emf);
     }

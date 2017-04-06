@@ -1,6 +1,7 @@
 package rest;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import facades.IRoleFacade;
 import facades.RoleFacade;
 import facades.UserFacade;
@@ -23,12 +24,16 @@ public class UserResource {
     private IUserFacade facade;
     private IRoleFacade roleFacade;
     private EntityManagerFactory emf;
+    private static GsonBuilder builder;
     private static Gson gson = new Gson();
 
     /**
      * Creates a new instance of PersonResource
      */
     public UserResource() {
+        builder = new GsonBuilder();
+        builder.excludeFieldsWithoutExposeAnnotation();
+        gson = builder.create();
         emf = Persistence.createEntityManagerFactory("pu_development");
         facade = new UserFacade(emf);
         roleFacade = new RoleFacade(emf);
