@@ -10,7 +10,10 @@ import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import facades.UserFacade;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -80,7 +83,12 @@ public class Login {
       Secret.SHARED_SECRET = new byte[32];
       random.nextBytes(Secret.SHARED_SECRET);
 
-      utils.makeTestUsers.cheatingStuff(); // add the damn users and stuff
+
+      EntityManagerFactory emf = Persistence.createEntityManagerFactory("pu_development");
+      IUserFacade facade = new UserFacade(emf);
+      if(facade.getUserByUserId("Anne") == null) {
+        utils.makeTestUsers.cheatingStuff(); // add the damn users and stuff
+      }
     }
     JWSSigner signer = new MACSigner(Secret.SHARED_SECRET);
     Date date = new Date();
