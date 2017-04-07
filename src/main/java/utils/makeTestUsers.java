@@ -1,5 +1,6 @@
 package utils;
 
+import entity.Book;
 import entity.Role;
 import entity.User;
 import facades.UserFacade;
@@ -39,6 +40,8 @@ public class makeTestUsers {
 //        em.persist(both);
         em.persist(peter);
         em.persist(anne);
+        Book b1=new Book("BookBook", "4242424242420", "It's a BookBook");
+        em.persist(b1);
         em.getTransaction().commit();
         System.out.println("Created TEST Users");
       }
