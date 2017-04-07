@@ -32,4 +32,41 @@ public class Book implements Serializable {
     @Column(length = 2048, nullable = false)
     private String description;
 
+    public Book() {
+    }
+
+    public Book(String title, String isbn, String description) {
+        this.title = title;
+        this.isbn = isbn;
+        this.description = description;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 }
