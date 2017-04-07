@@ -5,14 +5,21 @@
  */
 package rest;
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
+import entity.Role;
+import facades.IRoleFacade;
+import facades.RoleFacade;
+import facades.UserFacade;
+import security.IUserFacade;
+import security.PasswordStorage;
+
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * REST Web Service
@@ -22,6 +29,10 @@ import javax.ws.rs.core.MediaType;
 @Path("demoall")
 public class All {
 
+  private IUserFacade facade;
+  private IRoleFacade roleFacade;
+  private EntityManagerFactory emf;
+
   @Context
   private UriInfo context;
 
@@ -29,6 +40,9 @@ public class All {
    * Creates a new instance of A
    */
   public All() {
+    emf = Persistence.createEntityManagerFactory("pu_development");
+    facade = new UserFacade(emf);
+    roleFacade = new RoleFacade(emf);
   }
 
   /**
@@ -39,6 +53,30 @@ public class All {
   @Produces(MediaType.APPLICATION_JSON)
   public String getText() {
     return " {\"message\" : \"result for all\"}";
+  }
+
+
+  @GET
+  @Path("hack")
+  public String hack() {
+    try {
+      Role userRole = new Role("User");
+      Role adminRole = new Role("Admin");
+      entity.User peter = new entity.User("Peter", PasswordStorage
+              .createHash("test"));
+      peter.addRole(userRole);
+      entity.User anne = new entity.User("Anne", PasswordStorage
+              .createHash("test"));
+      anne.addRole(adminRole);
+      roleFacade.addRole(userRole);
+      roleFacade.addRole(adminRole);
+      facade.addUser(peter);
+      facade.addUser(anne);
+      return "Success";
+    } catch (PasswordStorage.CannotPerformOperationException e) {
+      e.printStackTrace();
+      return "Success";
+    }
   }
 
 }
