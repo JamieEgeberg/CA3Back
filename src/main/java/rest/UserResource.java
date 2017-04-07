@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import facades.IRoleFacade;
 import facades.RoleFacade;
 import facades.UserFacade;
+import javax.annotation.security.RolesAllowed;
 import security.IUserFacade;
 
 import javax.persistence.EntityManagerFactory;
@@ -18,7 +19,7 @@ import javax.ws.rs.core.MediaType;
  * @author Niki
  */
 @Path("user")
-//@RolesAllowed("Admin")
+@RolesAllowed("Admin")
 public class UserResource {
 
     private IUserFacade facade;
