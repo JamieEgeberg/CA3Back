@@ -6,11 +6,8 @@
 package rest;
 
 import entity.Role;
-import facades.IRoleFacade;
-import facades.RoleFacade;
-import facades.UserFacade;
-import security.IUserFacade;
 import security.PasswordStorage;
+import utils.Utility;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -29,8 +26,6 @@ import javax.ws.rs.core.UriInfo;
 @Path("demoall")
 public class All {
 
-  private IUserFacade facade;
-  private IRoleFacade roleFacade;
   private EntityManagerFactory emf;
 
   @Context
@@ -41,8 +36,6 @@ public class All {
    */
   public All() {
     emf = Persistence.createEntityManagerFactory("pu_development");
-    facade = new UserFacade(emf);
-    roleFacade = new RoleFacade(emf);
   }
 
   /**
@@ -62,20 +55,19 @@ public class All {
     try {
       Role userRole = new Role("User");
       Role adminRole = new Role("Admin");
+      Utility.persist(emf.createEntityManager(), userRole);
+      Utility.persist(emf.createEntityManager(), adminRole);
       entity.User peter = new entity.User("Peter", PasswordStorage
               .createHash("test"));
       peter.addRole(userRole);
       entity.User anne = new entity.User("Anne", PasswordStorage
               .createHash("test"));
       anne.addRole(adminRole);
-      roleFacade.addRole(userRole);
-      roleFacade.addRole(adminRole);
-      facade.addUser(peter);
-      facade.addUser(anne);
+      Utility.persist(emf.createEntityManager(), peter);
+      Utility.persist(emf.createEntityManager(), anne);
       return "Success";
-    } catch (PasswordStorage.CannotPerformOperationException e) {
-      e.printStackTrace();
-      return "Success";
+    } catch (Exception ignored) {
+      return "Failed";
     }
   }
 
