@@ -2,12 +2,14 @@ package rest;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import entity.Role;
 import facades.IRoleFacade;
 import facades.RoleFacade;
 import facades.UserFacade;
-import javax.annotation.security.RolesAllowed;
 import security.IUserFacade;
+import security.PasswordStorage;
 
+import javax.annotation.security.RolesAllowed;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.ws.rs.*;
@@ -85,6 +87,29 @@ public class UserResource {
     public String delete(@PathParam("id") String id) {
         return gson.toJson(facade.deleteUser(id));
         //return "{\"message\":\"Deleted book with id: \"" + id + "}";
+    }
+
+    @GET
+    @Path("hack")
+    public String hack() {
+        try {
+            Role userRole = new Role("User");
+            Role adminRole = new Role("Admin");
+            entity.User peter = new entity.User("Peter", PasswordStorage
+                    .createHash("test"));
+            peter.addRole(userRole);
+            entity.User anne = new entity.User("Anne", PasswordStorage
+                    .createHash("test"));
+            anne.addRole(adminRole);
+            roleFacade.addRole(userRole);
+            roleFacade.addRole(adminRole);
+            facade.addUser(peter);
+            facade.addUser(anne);
+            return "Success";
+        } catch (PasswordStorage.CannotPerformOperationException e) {
+            e.printStackTrace();
+            return "Success";
+        }
     }
 
 }

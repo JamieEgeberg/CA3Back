@@ -10,10 +10,7 @@ import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import facades.UserFacade;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -69,26 +66,19 @@ public class Login {
     String rolesAsString = res.length() > 0 ? res.substring(0, res.length() - 1) : "";
     String issuer = "semester3demo-cphbusiness.dk-computerScience";
 
-    
+
     if (Secret.SHARED_SECRET == null) {
       /*
-       A (much) better solution would be to have a fixed "secret" stored somewhere safe. 
+       A (much) better solution would be to have a fixed "secret" stored somewhere safe.
        This solution will render all issued tokens invalid, if the server is restarted
-       It's done like this, to force you to know what you do. If you have a "fixed" secret, stored in a 
+       It's done like this, to force you to know what you do. If you have a "fixed" secret, stored in a
        public Git repository, you have NO security at all.
       */
-      
+
       // Generate random 256-bit (32-byte) shared secret
       SecureRandom random = new SecureRandom();
       Secret.SHARED_SECRET = new byte[32];
       random.nextBytes(Secret.SHARED_SECRET);
-
-
-      EntityManagerFactory emf = Persistence.createEntityManagerFactory("pu_development");
-      IUserFacade facade = new UserFacade(emf);
-      if(facade.getUserByUserId("Anne") == null) {
-        utils.makeTestUsers.cheatingStuff(); // add the damn users and stuff
-      }
     }
     JWSSigner signer = new MACSigner(Secret.SHARED_SECRET);
     Date date = new Date();
