@@ -3,21 +3,20 @@ package security;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.nimbusds.jose.*;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jwt.*;
-import facades.UserFacade;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.List;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 @Path("login")
 public class Login {
@@ -80,6 +79,8 @@ public class Login {
       SecureRandom random = new SecureRandom();
       Secret.SHARED_SECRET = new byte[32];
       random.nextBytes(Secret.SHARED_SECRET);
+
+      utils.makeTestUsers.cheatingStuff(); // add the damn users and stuff
     }
     JWSSigner signer = new MACSigner(Secret.SHARED_SECRET);
     Date date = new Date();

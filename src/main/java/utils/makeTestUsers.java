@@ -4,17 +4,22 @@ import entity.Book;
 import entity.Role;
 import entity.User;
 import facades.UserFacade;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import security.PasswordStorage;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
-import security.PasswordStorage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class makeTestUsers {
 
   //Only for initial testing REMOVE BEFORE PRODUCTION
   //Run this file to setup the users required to use the initial version of the seed
   public static void main(String[] args) {
+    cheatingStuff();
+  }
+
+  public static void cheatingStuff() {
     EntityManager em = Persistence.createEntityManagerFactory("pu_development").createEntityManager();
     try {
       System.out.println("Creating TEST Users");
@@ -32,7 +37,7 @@ public class makeTestUsers {
         User peter = new User("Peter", PasswordStorage.createHash("test"));
         peter.addRole(userRole);
         User anne = new User("Anne", PasswordStorage.createHash("test"));
-        anne.addRole(adminRole);        
+        anne.addRole(adminRole);
         em.persist(userRole);
         em.persist(adminRole);
 //        em.persist(user);
